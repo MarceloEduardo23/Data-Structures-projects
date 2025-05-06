@@ -1,6 +1,6 @@
 <p align="center">
   <img src="https://ufal.br/ufal/comunicacao/identidade-visual/brasao/sigla/jpg.jpg" alt="University Logo" width="150"/>
-  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYxk0_tV2T-VL5hO56OLX8YYK3Wu3-UCxqgA&s" alt="Course Logo" width="150"/>
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYxk0_tV2T-VL5hO56OLX8YYK3Wu3-UCxqgA&s" alt="Course Logo" width="130"/>
 </p>
 
 <h1 align="center">📊📚 Data Structures and Algorithms — Academic Project Collection</h1>
