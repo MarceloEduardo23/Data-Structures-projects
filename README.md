@@ -1,7 +1,15 @@
-# 📊📚 Data Structures and Algorithms — Academic Project Collection
+<p align="center">
+  <img src="https://ufal.br/ufal/comunicacao/identidade-visual/brasao/sigla/jpg.jpg" alt="University Logo" width="150"/>
+  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYxk0_tV2T-VL5hO56OLX8YYK3Wu3-UCxqgA&s" alt="Course Logo" width="150"/>
+</p>
 
-Welcome to this repository 📦!  
-Here you will find a collection of academic projects developed to explore essential concepts in **data structures**, **algorithmic techniques**, and **computational analysis**. Each project focuses on applying theory to practice through implementations, benchmarks, and visualizations.
+<h1 align="center">📊📚 Data Structures and Algorithms — Academic Project Collection</h1>
+
+---
+
+## 📦 About
+
+Welcome! 📦 This repository contains a collection of academic projects focused on **data structures**, **algorithmic techniques**, and **computational analysis**. Each project bridges theory with practice, featuring implementations, benchmarks, and visualizations.
 
 ---
 
@@ -44,7 +52,7 @@ Covers:
 - 📝 Optimal path search in weighted graphs  
 - 📊 Complexity and performance analysis  
 
-Developed as an academic seminar project 📖.
+Developed as part of an academic seminar on search algorithms 📖.
 
 ---
 
