@@ -1,7 +1,12 @@
 #include "bibliotecas/huffman.h"
 
+/**
+ * @brief Compacta um arquivo usando o algoritmo de Huffman.
+ * 
+ * @param caminho Caminho do arquivo a ser compactado.
+ * @param nome_arquivo Nome para o arquivo compactado de saída.
+ */
 void compactar(char *caminho, char *nome_arquivo){
-    /***** PARTE 1: LER ARQUIVO E GERAR A TABELA DE FREQUÊNCIA *****/
     FILE *arquivo_entrada = fopen(caminho, "rb");
     if(!arquivo_entrada){
         printf("\n\tERRO AO ABRIR ARQUIVO ENTRADA.\n");
@@ -12,17 +17,12 @@ void compactar(char *caminho, char *nome_arquivo){
     printf("\n\tTAMANHO DO ARQUIVO ORIGINAL: %ld bytes\n", tam_arq);
 
     unsigned long *frequencia = contar_frequencia(arquivo_entrada, tam_arq);
-    
-    /***** PASSO 2: GERAR FILA DE PRIORIDADE *****/
-    LISTA fila;
-    criar_fila(&fila);
 
-    preencher_fila(frequencia, &fila);
+    HEAP *heap = criar_heap(TAM_ASCII);
+    preencher_heap(frequencia, heap);
+    NOHUFF *arvore = montar_arvore_heap(heap);
 
-    /***** PASSO 3: GERAR ÁRVORE DE HUFFMAN *****/
-    NOHUFF *arvore = montar_arvore(&fila);
 
-    /***** PASSO 4: GERAR DICIONARIO *****/
     unsigned int tam_max = altura_arvore(arvore) + 1;
     unsigned char **dicionario = malloc(sizeof(unsigned char*) * TAM_ASCII);
 
@@ -31,7 +31,6 @@ void compactar(char *caminho, char *nome_arquivo){
 
     gerar_dicionario(dicionario, arvore, "", tam_max);
     
-    /***** PARTE 5: GERAR ARQUIVO COMPACTADO *****/
     FILE *arquivo_saida = fopen(nome_arquivo, "wb");
     if(!arquivo_saida){
         printf("\n\tERRO AO CRIAR ARQUIVO SAIDA");
@@ -51,6 +50,40 @@ void compactar(char *caminho, char *nome_arquivo){
     fclose(arquivo_saida);
 }
 
+/**
+ * @brief Descompacta um arquivo compactado usando Huffman.
+ * 
+ * @param caminho Caminho do arquivo compactado.
+ * @param nome_arquivo Nome para o arquivo descompactado.
+ */
+void descompactar(char *caminho, char *nome_arquivo){
+    FILE *arquivo_entrada = fopen(caminho, "rb");
+    if(!arquivo_entrada){
+        printf("\n\tERRO AO ABRIR ARQUIVO ENTRADA.\n");
+        return;
+    }
+
+    unsigned long tam_arq = tamanho_arquivo(arquivo_entrada);
+
+    unsigned short tam_lixo;
+    unsigned short tam_arvore;
+
+    ler_cabecalho(arquivo_entrada, &tam_lixo, &tam_arvore);
+
+    FILE *arquivo_saida = fopen(nome_arquivo, "wb");
+    if(!arquivo_saida){
+        printf("\n\tERRO AO CRIAR ARQUIVO SAIDA.\n");
+        return;
+    }
+
+    decodificar(arquivo_entrada, arquivo_saida, tam_arq, tam_lixo, tam_arvore);
+}
+
+/**
+ * @brief Função principal do programa, que apresenta o menu e chama os métodos de compactação e descompactação.
+ * 
+ * @return int 0 para sucesso.
+ */
 int main(){
     int escolha;
 
@@ -98,7 +131,7 @@ int main(){
         compactar(caminho, nome_arquivo);
 
         break;
-    }/*
+    }
     case 2:{
         printf("\n\tDIGITE O CAMINHO COMPLETO DO ARQUIVO QUE DESEJA ABRIR: ");
 
@@ -133,7 +166,7 @@ int main(){
         descompactar(caminho, nome_arquivo);
 
         break;
-    }*/
+    }
     
     default:
         printf("\n\tOPÇÃO INVÁLIDA!");
