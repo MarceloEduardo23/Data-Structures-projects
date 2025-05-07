@@ -1,3 +1,8 @@
+/**
+ * @file huffman.h
+ * @brief Funções para a compactação e descompactação Huffman.
+ */
+
 #include "structs.h"
 
 /**
@@ -7,11 +12,11 @@
  * @return unsigned long Tamanho do arquivo em bytes ou -1 se inválido.
  */
 unsigned long tamanho_arquivo(FILE *arquivo_entrada){
-    if(!arquivo_entrada) return -1;
+    if(!arquivo_entrada) return -1; 
 
-    fseek(arquivo_entrada, 0, SEEK_END);
-    unsigned long tam_arq = ftell(arquivo_entrada);
-    rewind(arquivo_entrada);
+    fseek(arquivo_entrada, 0, SEEK_END);    /**< Adiciona o cursor/ponto de inserção para o fim do arquivo */
+    unsigned long tam_arq = ftell(arquivo_entrada);  /**< Transfere o tamanho do arquivo para a variável tam_arq */
+    rewind(arquivo_entrada);  /**< Adiciona o cursor/ponto de inserção para o inicio do arquivo */
     
     return tam_arq;
 }
@@ -28,8 +33,8 @@ unsigned long *contar_frequencia(FILE *arquivo_entrada, unsigned long tam_arq){
     unsigned char byte;
 
     for(int i = 0; i < tam_arq; i++){
-        fread(&byte, sizeof(unsigned char), 1, arquivo_entrada);
-        frequencia[byte]++;
+        fread(&byte, sizeof(unsigned char), 1, arquivo_entrada); /**< Lê o caracter do arquivo (Um por vez) e adiciona para a variável byte */
+        frequencia[byte]++; /**< Vai na posição do caracter segundo a tabela ASCII e adiciona mais um em O(1) */
     }
 
     rewind(arquivo_entrada);
@@ -136,8 +141,8 @@ void preencher_heap(unsigned long *frequencia, HEAP *heap) {
     for (int i = 0; i < TAM_ASCII; i++) {
         if (frequencia[i] > 0) {
             novo = malloc(sizeof(NOHUFF));
-            novo->caracter = malloc(sizeof(unsigned char));
-            *(unsigned char*) novo->caracter = i;
+            novo->caracter = malloc(sizeof(unsigned char)); /**< Aloca o tamanho para o *void */
+            *(unsigned char*) novo->caracter = i; /**< Adiciona o caracter a estrutura */
             novo->frequencia = frequencia[i];
             novo->direita = NULL;
             novo->esquerda = NULL;
@@ -245,6 +250,7 @@ short salvar_arvore(NOHUFF *raiz, FILE *arquivo_saida){
  * @param dicionario Vetor de dicionário de Huffman.
  * @param tam_arq Tamanho do arquivo original.
  * @param tam_arvore Tamanho da arvore binaria.
+ * @return short tamanho do lixo obtido no ultimo byte.
  */
 short salvar_dados(FILE *arquivo_entrada, FILE *arquivo_saida, unsigned char **dicionario, int tam_arquivo, int tam_arvore){
     int bit_atual = 0;
@@ -319,7 +325,7 @@ void ler_cabecalho(FILE *arquivo_entrada, unsigned short *tam_lixo, unsigned sho
     cabecalho |= buffer;
 
     *tam_lixo = cabecalho >> 13;
-    *tam_arvore = cabecalho & 0x1FFF; // USADO COMO MASCARA (0X1FFFF)
+    *tam_arvore = cabecalho & 0x1FFF;
 
     printf("\n\tTamanho Lixo: %d\n", *tam_lixo);
     printf("\n\tTamanho Arvore: %d\n", *tam_arvore);
@@ -331,8 +337,9 @@ void ler_cabecalho(FILE *arquivo_entrada, unsigned short *tam_lixo, unsigned sho
  * @param caractere Caracter a ser adicionado na arvore.
  * @param esquerda Ponteiro para o no esquerdo.
  * @param direita Ponteiro para o no direito.
+ * @return ponteiro para NOHUFF do novo no.
  */
-NOHUFF*criar_arvore(unsigned char caractere, NOHUFF *esquerda, NOHUFF *direita){
+NOHUFF* criar_arvore(unsigned char caractere, NOHUFF *esquerda, NOHUFF *direita){
     NOHUFF *novo = malloc(sizeof(NOHUFF));
     novo->caracter = malloc(sizeof(unsigned char));
     *(unsigned char*) novo->caracter = caractere;
@@ -347,6 +354,7 @@ NOHUFF*criar_arvore(unsigned char caractere, NOHUFF *esquerda, NOHUFF *direita){
  * 
  * @param arquivo_entrada Nome do arquivo entrada.
  * @param tam_arvore Tamanho da arvore.
+ * @return ponteiro NOHUFF de forma recursiva retorna a raiz da arvore.
  */
 NOHUFF *remontar_arvore(FILE *arquivo_entrada, unsigned short *tam_arvore){
     unsigned char buffer;
