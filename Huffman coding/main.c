@@ -18,10 +18,13 @@ void compactar(char *caminho, char *nome_arquivo){
 
     unsigned long *frequencia = contar_frequencia(arquivo_entrada, tam_arq);
 
-    HEAP *heap = criar_heap(TAM_ASCII);
-    preencher_heap(frequencia, heap);
-    NOHUFF *arvore = montar_arvore_heap(heap);
+    LISTA fila;
+    fila.inicio = NULL;
+    fila.tamanho = 0;
 
+    preencher_fila(frequencia, &fila);
+
+    NOHUFF *arvore = montar_arvore(&fila);
 
     unsigned int tam_max = altura_arvore(arvore) + 1;
     unsigned char **dicionario = malloc(sizeof(unsigned char*) * TAM_ASCII);
@@ -101,11 +104,10 @@ int main(){
 
         char caminho[MAX_LEITURA];
 
-        if(!fgets(caminho, MAX_LEITURA, stdin)){ //CASO DE ALGUM BUG
+        if(!fgets(caminho, MAX_LEITURA, stdin)){ 
             printf("\n\tERRO: FALHA AO LER A ENTRADA.\n");
             break;
         }
-        // Verifica se o caminho está vazio
         if (strlen(caminho) == 0) {
             printf("\n\tERRO: CAMINHO VAZIO.\n");
             break;
@@ -114,17 +116,16 @@ int main(){
         char nome_arquivo[MAX_LEITURA];
 
         printf("\n\tDIGITE O NOME PARA O ARQUIVO COMPACTADO: ");
-        if(!fgets(nome_arquivo, MAX_LEITURA, stdin)){ //CASO DE ALGUM BUG
+        if(!fgets(nome_arquivo, MAX_LEITURA, stdin)){
             printf("\n\tERRO: FALHA AO LER A NOME DO ARQUIVO.\n");
             break;
         }
-        // Verifica se o caminho está vazio
         if (strlen(nome_arquivo) == 0) {
             printf("\n\tERRO: NOME DO ARQUIVO VAZIO.\n");
             break;
         }
 
-        caminho[strcspn(caminho, "\n")] = '\0'; // REMOVE O '\n' do fim do texto caminho 
+        caminho[strcspn(caminho, "\n")] = '\0';
         nome_arquivo[strcspn(nome_arquivo, "\n")] = '\0'; 
         strcat(nome_arquivo, ".huff");
 
@@ -137,11 +138,10 @@ int main(){
 
         char caminho[MAX_LEITURA];
 
-        if(!fgets(caminho, MAX_LEITURA, stdin)){ //CASO DE ALGUM BUG
+        if(!fgets(caminho, MAX_LEITURA, stdin)){
             printf("\n\tERRO: FALHA AO LER A ENTRADA.huff.\n");
             break;
         }
-        // Verifica se o caminho está vazio
         if (strlen(caminho) == 0) {
             printf("\n\tERRO: CAMINHO VAZIO.\n");
             break;
@@ -150,17 +150,16 @@ int main(){
         char nome_arquivo[MAX_LEITURA];
 
         printf("\n\tDIGITE O NOME PARA O ARQUIVO DESCOMPACTADO (COM SUA EXTENÇÃO): ");
-        if(!fgets(nome_arquivo, MAX_LEITURA, stdin)){ //CASO DE ALGUM BUG
+        if(!fgets(nome_arquivo, MAX_LEITURA, stdin)){
             printf("\n\tERRO: FALHA AO LER A NOME DO ARQUIVO.\n");
             break;
         }
-        // Verifica se o caminho está vazio
         if (strlen(nome_arquivo) == 0) {
             printf("\n\tERRO: NOME DO ARQUIVO VAZIO.\n");
             break;
         }
 
-        caminho[strcspn(caminho, "\n")] = '\0'; // REMOVE O '\n' do fim do texto caminho 
+        caminho[strcspn(caminho, "\n")] = '\0';
         nome_arquivo[strcspn(nome_arquivo, "\n")] = '\0'; 
 
         descompactar(caminho, nome_arquivo);
