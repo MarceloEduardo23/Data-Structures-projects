@@ -14,9 +14,9 @@
 unsigned long tamanho_arquivo(FILE *arquivo_entrada){
     if(!arquivo_entrada) return -1; 
 
-    fseek(arquivo_entrada, 0, SEEK_END);    /**< Adiciona o cursor/ponto de inserção para o fim do arquivo */
-    unsigned long tam_arq = ftell(arquivo_entrada);  /**< Transfere o tamanho do arquivo para a variável tam_arq */
-    rewind(arquivo_entrada);  /**< Adiciona o cursor/ponto de inserção para o inicio do arquivo */
+    fseek(arquivo_entrada, 0, SEEK_END);   
+    unsigned long tam_arq = ftell(arquivo_entrada);
+    rewind(arquivo_entrada);
     
     return tam_arq;
 }
@@ -33,8 +33,8 @@ unsigned long *contar_frequencia(FILE *arquivo_entrada, unsigned long tam_arq){
     unsigned char byte;
 
     for(int i = 0; i < tam_arq; i++){
-        fread(&byte, sizeof(unsigned char), 1, arquivo_entrada); /**< Lê o caracter do arquivo (Um por vez) e adiciona para a variável byte */
-        frequencia[byte]++; /**< Vai na posição do caracter segundo a tabela ASCII e adiciona mais um em O(1) */
+        fread(&byte, sizeof(unsigned char), 1, arquivo_entrada);
+        frequencia[byte]++; 
     }
 
     rewind(arquivo_entrada);
@@ -42,144 +42,93 @@ unsigned long *contar_frequencia(FILE *arquivo_entrada, unsigned long tam_arq){
 }
 
 /**
- * @brief Cria uma heap mínima.
+ * @brief Adiciona o nó de forma ordenada.
  * 
- * @param capacidade Número máximo de elementos.
- * @return HEAP* Ponteiro para a heap criada.
+ * @param fila Ponteiro para a fila.
+ * @param novo Ponteiro para o no a ser ordenado.
  */
-HEAP *criar_heap(int capacidade) {
-    HEAP *heap = malloc(sizeof(HEAP));
-    heap->dados = malloc(capacidade * sizeof(NOHUFF*));
-    heap->tamanho = 0;
-    heap->capacidade = capacidade;
-    return heap;
-}
-
-/**
- * @brief Troca dois ponteiros de nós da árvore.
- * 
- * @param a Ponteiro para o primeiro nó.
- * @param b Ponteiro para o segundo nó.
- */
-void trocar_no(NOHUFF **a, NOHUFF **b) {
-    NOHUFF *temp = *a;
-    *a = *b;
-    *b = temp;
-}
-
-/**
- * @brief Reorganiza a heap para cima a partir de um índice.
- * 
- * @param heap Ponteiro para a heap.
- * @param indice Índice do elemento a reposicionar.
- */
-void heapify_up(HEAP *heap, int indice) {
-    int pai = (indice - 1) / 2;
-    if (indice && heap->dados[indice]->frequencia < heap->dados[pai]->frequencia) {
-        trocar_no(&heap->dados[indice], &heap->dados[pai]);
-        heapify_up(heap, pai);
+void inserir_ordenado(LISTA *fila, NOHUFF *novo){
+    if(fila->inicio == NULL || novo->frequencia <= fila->inicio->frequencia){
+        novo->prox = fila->inicio;
+        fila->inicio = novo;
+    }else{
+        NOHUFF *aux = fila->inicio;
+        while(aux->prox && aux->prox->frequencia < novo->frequencia)
+            aux = aux->prox;
+        novo->prox = aux->prox;
+        aux->prox = novo;
     }
+    fila->tamanho++;
 }
 
 /**
- * @brief Reorganiza a heap para baixo a partir de um índice.
+ * @brief Cria um novo no para a lista encadeada ordenada.
  * 
- * @param heap Ponteiro para a heap.
- * @param indice Índice inicial.
+ * @param frequencia Array com as frequencias.
+ * @param lista Ponteiro para a lista encadeada ordenada.
  */
-void heapify_down(HEAP *heap, int indice) {
-    int menor = indice;
-    int esq = 2 * indice + 1;
-    int dir = 2 * indice + 2;
-
-    if (esq < heap->tamanho && heap->dados[esq]->frequencia < heap->dados[menor]->frequencia)
-        menor = esq;
-    if (dir < heap->tamanho && heap->dados[dir]->frequencia < heap->dados[menor]->frequencia)
-        menor = dir;
-
-    if (menor != indice) {
-        trocar_no(&heap->dados[indice], &heap->dados[menor]);
-        heapify_down(heap, menor);
-    }
-}
-
-/**
- * @brief Insere um nó na heap.
- * 
- * @param heap Ponteiro para a heap.
- * @param no Ponteiro para o nó.
- */
-void inserir_heap(HEAP *heap, NOHUFF *no) {
-    heap->dados[heap->tamanho] = no;
-    heapify_up(heap, heap->tamanho);
-    heap->tamanho++;
-}
-
-/**
- * @brief Remove e retorna o menor elemento da heap.
- * 
- * @param heap Ponteiro para a heap.
- * @return NOHUFF* Ponteiro para o nó removido.
- */
-NOHUFF *remover_minimo(HEAP *heap) {
-    if (heap->tamanho == 0) return NULL;
-    NOHUFF *minimo = heap->dados[0];
-    heap->dados[0] = heap->dados[--heap->tamanho];
-    heapify_down(heap, 0);
-    return minimo;
-}
-
-/**
- * @brief Preenche a heap com nós a partir das frequências.
- * 
- * @param frequencia Vetor de frequência.
- * @param heap Ponteiro para a heap.
- */
-void preencher_heap(unsigned long *frequencia, HEAP *heap) {
+void preencher_fila(unsigned long *frequencia, LISTA *lista){
     NOHUFF *novo;
-
-    for (int i = 0; i < TAM_ASCII; i++) {
-        if (frequencia[i] > 0) {
+    for(int i = 0; i < TAM_ASCII; i++){
+        if(frequencia[i] > 0){
             novo = malloc(sizeof(NOHUFF));
-            novo->caracter = malloc(sizeof(unsigned char)); /**< Aloca o tamanho para o *void */
-            *(unsigned char*) novo->caracter = i; /**< Adiciona o caracter a estrutura */
+
+            novo->caracter = malloc(sizeof(unsigned char));
+            *(unsigned char*) novo->caracter = i;
             novo->frequencia = frequencia[i];
             novo->direita = NULL;
             novo->esquerda = NULL;
             novo->prox = NULL;
 
-            inserir_heap(heap, novo);
+            inserir_ordenado(lista, novo);
         }
     }
 }
 
 /**
- * @brief Monta a árvore de Huffman a partir da heap.
+ * @brief Remove o caracter com menor frequencia, da lista, que se encontra no inicio, pois ela está ordenada do menor para o maior
  * 
- * @param heap Ponteiro para a heap.
- * @return NOHUFF* Ponteiro para a raiz da árvore.
+ * @param fila Ponteiro para o início da fila.
+ * @return O no removido.
  */
-NOHUFF *montar_arvore_heap(HEAP *heap) {
-    NOHUFF *primeiro, *segundo, *novo;
+NOHUFF *remove_no_inicio(LISTA *fila){
+    NOHUFF *aux = NULL;
 
-    while (heap->tamanho > 1) {
-        primeiro = remover_minimo(heap);
-        segundo = remover_minimo(heap);
+    if (fila->inicio){
+        aux = fila->inicio;
+        fila->inicio = aux->prox;
+        aux->prox = NULL;
+        fila->tamanho--;
+    }
+
+    return aux;
+}
+
+/**
+ * @brief Monta a arvore de huffman, juntando os dois ultimos nos.
+ * 
+ * @param fila Ponteiro para a fila.
+ * @return retorna a raiz da arvore.
+ */
+NOHUFF *montar_arvore(LISTA *fila){
+    NOHUFF *primeiro, *segundo, *novo;
+    while(fila->tamanho > 1){
+        primeiro = remove_no_inicio(fila);
+        segundo = remove_no_inicio(fila);
 
         novo = malloc(sizeof(NOHUFF));
         novo->caracter = malloc(sizeof(unsigned char));
-        *(unsigned char*) novo->caracter = '*';
+        *(unsigned char*)novo->caracter = '*';
         novo->frequencia = primeiro->frequencia + segundo->frequencia;
         novo->esquerda = primeiro;
         novo->direita = segundo;
         novo->prox = NULL;
 
-        inserir_heap(heap, novo);
+        inserir_ordenado(fila, novo);
     }
 
-    return remover_minimo(heap);
+    return fila->inicio;
 }
-
 /**
  * @brief Calcula a altura da árvore de Huffman.
  * 
