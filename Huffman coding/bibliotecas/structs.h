@@ -32,23 +32,21 @@
  * - Ponteiros para os nós esquerdo e direito na árvore de Huffman.
  */
 typedef struct nohuff {
-    void *caracter;               /**< Ponteiro para o caractere (ou valor associado). */
-    int frequencia;               /**< Frequência de ocorrência do caractere. */
-    struct nohuff *prox;          /**< Ponteiro para o próximo nó (utilizado em listas). */
-    struct nohuff *esquerda;      /**< Ponteiro para o filho esquerdo na árvore de Huffman. */
-    struct nohuff *direita;       /**< Ponteiro para o filho direito na árvore de Huffman. */
+    void *caracter;                       
+    int frequencia;                       
+    struct nohuff *prox;               
+    struct nohuff *esquerda, *direita;
 } NOHUFF;
 
 /**
  * @struct HEAP
- * @brief Estrutura que representa uma heap mínima para montagem da árvore de Huffman.
+ * @brief Estrutura que representa uma heap máxima para montagem da árvore de Huffman.
  *
  * A heap é implementada como um vetor de ponteiros para nós de Huffman, controlado pelos campos:
  * - tamanho: quantidade atual de elementos.
  * - capacidade: capacidade máxima permitida.
  */
-typedef struct {
-    NOHUFF **dados;      /**< Vetor de ponteiros para nós de Huffman. */
-    int tamanho;         /**< Quantidade atual de elementos no heap. */
-    int capacidade;      /**< Capacidade máxima do heap. */
-} HEAP; 
+typedef struct{
+    NOHUFF *inicio; 
+    int tamanho;
+}LISTA;
