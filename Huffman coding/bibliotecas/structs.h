@@ -39,12 +39,19 @@ typedef struct nohuff {
 } NOHUFF;
 
 /**
- * @struct HEAP
- * @brief Estrutura que representa uma heap máxima para montagem da árvore de Huffman.
+ * @struct LISTA
+ * @brief Estrutura que representa uma lista encadeada ordenada de nós de Huffman.
  *
- * A heap é implementada como um vetor de ponteiros para nós de Huffman, controlado pelos campos:
- * - tamanho: quantidade atual de elementos.
- * - capacidade: capacidade máxima permitida.
+ * A lista é usada como estrutura auxiliar para construir a árvore de Huffman.
+ * Ela mantém os nós em ordem crescente de frequência (do menor para o maior).
+ *
+ * Campos:
+ * - NOHUFF* inicio: ponteiro para o primeiro nó da lista.
+ * - int tamanho: número de elementos atualmente na lista.
+ *
+ * Essa lista permite:
+ * - Inserção ordenada de nós.
+ * - Remoção dos dois nós com menor frequência (para combinação na árvore).
  */
 typedef struct{
     NOHUFF *inicio; 
