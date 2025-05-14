@@ -256,6 +256,8 @@ void salvar_cabecalho(FILE *arquivo_saida, unsigned short tam_lixo, unsigned sho
     fwrite(&buffer, sizeof(unsigned char), 1, arquivo_saida);
 }
 
+///////////////////////////////////////////// DESCOMPACTAR //////////////////////////////////////////////////
+
 /**
  * @brief Le o cabecalho do arquivo compactado para descobrir o tamanho do lixo e arvore.
  * 
