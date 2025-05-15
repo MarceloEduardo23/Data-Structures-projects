@@ -51,10 +51,13 @@ void compactar(char *caminho, char *nome_arquivo){
     salvar_cabecalho(arquivo_saida, tam_lixo, tam_arvore);
 
     fclose(arquivo_saida);
+    liberar_arvore(arvore);
+    free(frequencia);
+    free(dicionario);
 }
 
 /**
- * @brief Descompacta um arquivo compactado usando Huffman.
+ * @brief Descompacta um arquivo usando Huffman.
  * 
  * @param caminho Caminho do arquivo compactado.
  * @param nome_arquivo Nome para o arquivo descompactado.
