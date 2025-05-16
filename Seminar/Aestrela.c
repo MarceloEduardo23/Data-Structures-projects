@@ -1,132 +1,132 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdio.h> 
+#include <stdlib.h> 
 #include <math.h>
+#include <string.h> 
+#include <stdbool.h>
+#include <limits.h>
 
-#define WIDTH 5
-#define HEIGHT 5
-#define MAX_NODES 1000
+#define ALTURA 5
+#define LARGURA 5
+#define MAX_NODES (ALTURA*LARGURA)
 
-typedef struct Node {
-    int x, y;       // Coordenadas na grade
-    int g, h, f;    // g : custo do iníco até o nó
-                    // h : estimativa até  o destino (função heurística)
-                    // f = g + h
-    struct Node* parent;  // Ponteiro para o nó anterior no caminho
-    int in_open;           // Marcam se o nó está na openList ou closedList
-    int in_closed;
-} Node;
+int TERRENO[ALTURA][LARGURA] = {
+          {1, 1, 1, 1, 1},
+          {1, 4, 4, 1, 1},
+          {1, 4, 1, 1, 1},
+          {1, 1, 1, 3, 3},
+          {1, 1, 1, 1, 1},
+};
 
-int heuristic(Node* a, Node* b) {
-    return abs(a->x - b->x) + abs(a->y - b->y); // Utiliza da distâcia de Manhattan para calcular o melhor caminho
+/* 1 = obstáculo (muro), 0 = livre */
+int OBSTACULO[ALTURA][LARGURA] = {
+          {0, 1, 0, 0, 0},
+          {0, 1, 0, 1, 0},
+          {0, 1, 0, 1, 0},
+          {0, 0, 0, 1, 0},
+          {0, 0, 0, 0, 0},
+};
+
+typedef struct node {
+    int x , y ;
+    int f, g , h; 
+    int custo;
+    struct node *next; 
+    int closed , open ;
+}NODE;
+int heuristic (NODE *a, NODE *b){
+    return abs(a->x - b->x) + abs(a->y - b->y);
 }
-
-int distance(Node* a, Node* b) {  // O peso das arestas entre os nós (seria legal colocar pesos diferentes)
-    return 1; 
+int distancia(NODE *de, NODE *ate){
+    return ate->custo;
 }
-
-void reconstruct_path(Node* current) { // Caminha de trás para frente (do destino até o início)
+void imprimir_caminho(NODE *current){
     printf("Caminho encontrado:\n");
-    while (current != NULL) {
-        printf("(%d, %d) <- ", current->x, current->y);
-        current = current->parent;
+    while (current){
+        printf("(%d,%d) ", current->x, current->y);
+        current = current->next;
+        if(current){
+            printf("<- ");
+        }
     }
-    printf("start\n");
+    printf("\n");
 }
+void A_star(NODE *start, NODE *goal, NODE nodes[ALTURA][LARGURA]){
+    NODE *aberto[MAX_NODES];
+    int count_aberto = 0;
 
-void A_Star(Node* start, Node* goal, Node nodes[HEIGHT][WIDTH]) {
-    Node* openList[MAX_NODES];
-    int openCount = 0;
-    // Iniciando os dados de busca
-    start->g = 0;
+    start->g = 0 ;
     start->h = heuristic(start, goal);
     start->f = start->g + start->h;
-    start->parent = NULL;
-    start->in_open = 1;
+    start->open = 1;
+    aberto[count_aberto++] = start;
 
-    openList[openCount++] = start;
+    const int dx[] = {0, 1, 0, -1};
+    const int dy[] = {-1, 0, 1, 0};
 
-    while (openCount > 0) {
-        // Encontrar nó com menor f
-        int bestIdx = 0;
-        for (int i = 1; i < openCount; i++) {
-            if (openList[i]->f < openList[bestIdx]->f)
-                bestIdx = i;
+    while (count_aberto){
+        int  best = 0;
+        for (int i = 1; i < count_aberto; i++){
+            if(aberto[i]->f < aberto[best]->f) best = 1;
         }
 
-        Node* current = openList[bestIdx];
+        NODE *current = aberto[best];
 
-        if (current->x == goal->x && current->y == goal->y) { // Se for caminho reconstroi o caminho da open list
-            reconstruct_path(current);
+        if (current == goal){
+            imprimir_caminho(current);
             return;
         }
 
-        // Remove current da openList
-        for (int i = bestIdx; i < openCount - 1; i++)
-            openList[i] = openList[i + 1];
-        openCount--;
-        current->in_open = 0;
-        current->in_closed = 1;
+        aberto[best] = aberto[--count_aberto];
+        current->open = 0;
+        current->closed = 1;
 
-        // define o deslocamento para 4 vizinho ortogonais (não conta as diagonais)
-        int dx[] = {0, 1, 0, -1};
-        int dy[] = {-1, 0, 1, 0};
+        for (int j = 0 ; j < 4; ++j){
+            int nx = current->x + dx[j];
+            int ny = current->y + dy[j];
 
-        for (int d = 0; d < 4; d++) {
-            int nx = current->x + dx[d];
-            int ny = current->y + dy[d];
-
-            if (nx < 0 || ny < 0 || nx >= WIDTH || ny >= HEIGHT)
-                continue;
-
-            Node* neighbor = &nodes[ny][nx];
-
-            if (neighbor->in_closed)
-                continue;
-
-            int tentative_g = current->g + distance(current, neighbor);
-
-            if (!neighbor->in_open) {
-                openList[openCount++] = neighbor;
-                neighbor->in_open = 1;
-            } else if (tentative_g >= neighbor->g) {
+            if (nx < 0 || ny < 0 || nx >= LARGURA || ny >= ALTURA){
                 continue;
             }
 
-            neighbor->parent = current;
-            neighbor->g = tentative_g;
-            neighbor->h = heuristic(neighbor, goal);
-            neighbor->f = neighbor->g + neighbor->h;
+            NODE *nbr = &nodes[ny][nx];
+            if(nbr->closed) continue;
+
+            int tentativa_g = current->g + distancia(current, nbr);
+            if (!nbr->open){
+                aberto[count_aberto++] = nbr;
+                nbr->open = 1;
+            }
+            else if (tentativa_g >= nbr->g){
+                continue;
+            }
+
+            nbr->next = current;
+            nbr->g = tentativa_g;
+            nbr->h = heuristic(nbr, goal);
+            nbr->f = nbr->g + nbr->h;
         }
     }
-
-    printf("Nenhum caminho encontrado.\n");
+    puts("Nenhum caminho encontrado.");
 }
+int main (){
+    NODE nodes[ALTURA][LARGURA] = {0};
 
-int main() {
-    Node nodes[HEIGHT][WIDTH] = {0};
-
-    // Inicialização dos nós
-    for (int y = 0; y < HEIGHT; y++) {
-        for (int x = 0; x < WIDTH; x++) {
-            nodes[y][x].x = x;
-            nodes[y][x].y = y;
-            nodes[y][x].g = 99999;
-            nodes[y][x].f = 99999;
-            nodes[y][x].in_open = 0;
-            nodes[y][x].in_closed = 0;
-            nodes[y][x].parent = NULL;
+    for (int y = 0 ; y < ALTURA; ++y){
+        for(int x = 0; x < LARGURA; ++x){
+            NODE *n = &nodes[y][x];
+            n->x = x;
+            n->y = y;
+            n->g = INT_MAX/2;
+            n->f = INT_MAX/2;
+            n->custo = TERRENO[x][y];
+            n->open = n->closed = 0;
+            n->next = NULL;
+            if(OBSTACULO[y][x]) n->closed = 1;
         }
     }
+    NODE *start = &nodes[0][0];
+    NODE *goal = &nodes[4][4];
 
-    // Obstáculos (podemos modficar de arcodo com o nosso puzzle)
-    nodes[1][1].in_closed = 1;
-    nodes[2][1].in_closed = 1;
-    nodes[3][1].in_closed = 1;
-
-    Node* start = &nodes[0][0];
-    Node* goal = &nodes[4][4];
-
-    A_Star(start, goal, nodes); // Execução do algoritmo 
-
-    return 0;
+    A_star(start, goal, nodes);
+    return 0; 
 }
