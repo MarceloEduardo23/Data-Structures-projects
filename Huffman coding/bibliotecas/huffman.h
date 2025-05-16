@@ -256,8 +256,6 @@ void salvar_cabecalho(FILE *arquivo_saida, unsigned short tam_lixo, unsigned sho
     fwrite(&buffer, sizeof(unsigned char), 1, arquivo_saida);
 }
 
-///////////////////////////////////////////// DESCOMPACTAR //////////////////////////////////////////////////
-
 /**
  * @brief Le o cabecalho do arquivo compactado para descobrir o tamanho do lixo e arvore.
  * 
@@ -368,4 +366,31 @@ void decodificar(FILE *arquivo_entrada, FILE *arquivo_saida, unsigned long tam_a
             aux = raiz;
         }
     }
+}
+
+/**
+ * @brief Libera toda a memória alocada para a árvore de Huffman
+ * 
+ * @param raiz Ponteiro para a raiz da árvore
+ */
+void liberar_arvore(NOHUFF* raiz) {
+    if (raiz == NULL) return;
+    liberar_arvore(raiz->esquerda);
+    liberar_arvore(raiz->direita);
+    free(raiz);
+}
+
+/**
+ * @brief Libera toda a memória alocada para o dicionário
+ * 
+ * @param dicionario Ponteiro para o dicionário
+ */
+void liberar_dicionario(unsigned char **dicionario) {
+    if (!dicionario) return;
+    
+    for (int i = 0; i < TAM_ASCII; i++) {
+        if (dicionario[i]) free(dicionario[i]);
+    }
+    
+    free(dicionario);
 }
