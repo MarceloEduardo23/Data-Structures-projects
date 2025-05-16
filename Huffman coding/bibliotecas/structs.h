@@ -3,11 +3,10 @@
  * @brief Definições de estruturas e constantes utilizadas no algoritmo de compressão Huffman.
  */
 
-#include <stdio.h>      /**< Para operações com arquivos (fopen, fread, etc.) */
-#include <stdlib.h>     /**< Para alocação de memória (malloc, free) */
-#include <ctype.h>      /**< Para verificar caracteres imprimíveis (isprint) */
+#include <stdio.h>      
+#include <stdlib.h>    
 #include <windows.h>    /**< Para suporte a acentuação no Windows (SetConsoleOutputCP) */
-#include <string.h>     /**< Para operações com strings (strcat, strcmp, etc.) */
+#include <string.h> 
 
 /** 
  * @def MAX_LEITURA
@@ -39,19 +38,12 @@ typedef struct nohuff {
 } NOHUFF;
 
 /**
- * @struct LISTA
- * @brief Estrutura que representa uma lista encadeada ordenada de nós de Huffman.
+ * @struct HEAP
+ * @brief Estrutura que representa uma heap máxima para montagem da árvore de Huffman.
  *
- * A lista é usada como estrutura auxiliar para construir a árvore de Huffman.
- * Ela mantém os nós em ordem crescente de frequência (do menor para o maior).
- *
- * Campos:
- * - NOHUFF* inicio: ponteiro para o primeiro nó da lista.
- * - int tamanho: número de elementos atualmente na lista.
- *
- * Essa lista permite:
- * - Inserção ordenada de nós.
- * - Remoção dos dois nós com menor frequência (para combinação na árvore).
+ * A heap é implementada como um vetor de ponteiros para nós de Huffman, controlado pelos campos:
+ * - tamanho: quantidade atual de elementos.
+ * - capacidade: capacidade máxima permitida.
  */
 typedef struct{
     NOHUFF *inicio; 
