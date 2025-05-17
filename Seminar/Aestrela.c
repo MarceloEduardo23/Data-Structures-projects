@@ -66,7 +66,7 @@ void A_star(NODE *start, NODE *goal, NODE nodes[ALTURA][LARGURA]){
     while (count_aberto){
         int  best = 0;
         for (int i = 1; i < count_aberto; i++){
-            if(aberto[i]->f < aberto[best]->f) best = 1;
+            if(aberto[i]->f < aberto[best]->f) best = i;
         }
 
         NODE *current = aberto[best];
